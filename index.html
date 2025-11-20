@@ -709,7 +709,69 @@
     </footer>
 
     <script>
-      const facilitiesData = [ /* data tetap sama seperti sebelumnya */ ];
+      // Data fasilitas kesehatan
+      const facilitiesData = [
+        {
+          nama: "Klinik Panti Rahayu",
+          alamat: "Jl. Simpang Borobudur No.1, Mojolangu",
+          telepon: "085173021670",
+          jenis: "Klinik",
+        },
+        {
+          nama: "Puskesmas Mojolangu",
+          alamat: "Jl. Sudimoro No.17 A, Mojolangu",
+          telepon: "0341482905",
+          jenis: "Puskesmas",
+        },
+        {
+          nama: "Puskesmas Kendalsari",
+          alamat: "Jl. Cengger Ayam I No.8, Tulusrejo",
+          telepon: "0341478215",
+          jenis: "Puskesmas",
+        },
+        {
+          nama: "Puskesmas Pembantu Jatimulyo",
+          alamat: "Jl. Simbar Menjangan, Jatimulyo",
+          telepon: "-",
+          jenis: "Puskesmas Pembantu",
+        },
+        {
+          nama: "Puskesmas Pembantu TunggulWulung",
+          alamat: "Jl. Arumba No.4, Tunggulwulung",
+          telepon: "0341484174",
+          jenis: "Puskesmas Pembantu",
+        },
+        {
+          nama: "UPTD Puskesmas Pembantu Sumbersari",
+          alamat: "Jl. Sigura - Gura No.29, Sumbersari",
+          telepon: "0341581442",
+          jenis: "Puskesmas Pembantu",
+        },
+        {
+          nama: "Puskesmas Dinoyo",
+          alamat: "Jl. Mt Haryono 9 No.13, Dinoyo",
+          telepon: "0341572640",
+          jenis: "Puskesmas",
+        },
+        {
+          nama: "Klinik THT Terpadu Malang",
+          alamat: "Jl. Cengkeh No.63, Tulusrejo",
+          telepon: "03414376509",
+          jenis: "Klinik Spesialis",
+        },
+        {
+          nama: "Klinik Widya Husada",
+          alamat: "Jl. Sudimoro No.16, Mojolangu",
+          telepon: "085236855950",
+          jenis: "Klinik",
+        },
+        {
+          nama: "Rumah Sakit Universitas Brawijaya",
+          alamat: "Jl. Soekarno Hatta, Lowokwaru",
+          telepon: "0341403000",
+          jenis: "Rumah Sakit",
+        },
+      ];
 
       function animateValue(el, start, end, duration, suffix = "") {
         let startTime = null;
@@ -757,9 +819,95 @@
         modal.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
       });
 
-      // Fungsi export PDF tetap sama (exportDataToPDF & exportAnalysisToPDF)
-      function exportDataToPDF() { /* kode export data tetap */ }
-      function exportAnalysisToPDF() { /* kode export analisis tetap */ }
+// Export Data Faskes ke PDF
+      function exportDataToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc
+          .setFontSize(20)
+          .setTextColor(26, 115, 232)
+          .text("DATA FASILITAS KESEHATAN", 105, 20, { align: "center" });
+        doc
+          .setFontSize(12)
+          .setTextColor(100, 100, 100)
+          .text("Kecamatan Lowokwaru, Kota Malang", 105, 28, {
+            align: "center",
+          });
+        doc
+          .setFontSize(10)
+          .text(
+            `Dicetak pada: ${new Date().toLocaleDateString("id-ID")}`,
+            105,
+            35,
+            { align: "center" }
+          );
+
+        const rows = facilitiesData.map((f, i) => [
+          i + 1,
+          f.nama,
+          f.alamat,
+          f.telepon,
+          f.jenis,
+        ]);
+        doc.autoTable({
+          head: [["No", "Nama Faskes", "Alamat", "Telepon", "Jenis"]],
+          body: rows,
+          startY: 45,
+          theme: "grid",
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [26, 115, 232], textColor: 255 },
+        });
+        doc.save("Data_Fasilitas_Kesehatan_Lowokwaru.pdf");
+      }
+
+      // Export Laporan Analisis ke PDF
+      function exportAnalysisToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc
+          .setFontSize(20)
+          .setTextColor(26, 115, 232)
+          .text("LAPORAN ANALISIS FASILITAS KESEHATAN", 105, 20, {
+            align: "center",
+          });
+        doc
+          .setFontSize(12)
+          .setTextColor(100, 100, 100)
+          .text("Kecamatan Lowokwaru, Kota Malang", 105, 28, {
+            align: "center",
+          });
+
+        let y = 45;
+        doc.setFontSize(11).setTextColor(0).text("ANALISIS STATISTIK", 20, y);
+        y += 15;
+        const jenisCount = {};
+        facilitiesData.forEach(
+          (f) => (jenisCount[f.jenis] = (jenisCount[f.jenis] || 0) + 1)
+        );
+        doc.setFontSize(10);
+        doc.text(`Total Fasilitas: ${facilitiesData.length}`, 25, y);
+        y += 8;
+        Object.entries(jenisCount).forEach(([j, c]) => {
+          doc.text(`${j}: ${c} unit`, 25, y);
+          y += 7;
+        });
+
+        doc.setFontSize(11).text("ANALISIS SPASIAL & REKOMENDASI", 20, y + 10);
+        const points = [
+          "• Terdapat 10 fasilitas kesehatan yang tersebar",
+          "• Distribusi terkonsentrasi di permukiman padat",
+          "• Puskesmas menjadi jenis terbanyak (4 unit)",
+          "• Akses terbaik di sekitar jalan utama",
+          "• Rekomendasi: Penambahan faskes di wilayah pinggiran",
+        ];
+        y += 20;
+        points.forEach((p) => {
+          doc.text(p, 25, y);
+          y += 8;
+        });
+
+        doc.save("Laporan_Analisis_Faskes_Lowokwaru.pdf");
+      }
     </script>
   </body>
 </html>
